@@ -1,14 +1,35 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from "react-native";
+import { ChannelList } from "stream-chat-expo";
+import { useContext, useMemo } from "react";
+import { Stack, useRouter } from "expo-router";
+import { chatUserId } from "@/chatConfig";
+import { AppContext } from "@/contexts/appContexts";
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+const filters = {
+  members: { $in: [chatUserId] },
+  type: "messaging",
+};
+const options = {
+  state: true,
+  watch: true,
+};
 
-export default function TabOneScreen() {
+export default function ChannelListScreen() {
+  const memoizedFilters = useMemo(() => filters, []);
+  const router = useRouter();
+  const { setChannel } = useContext(AppContext);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+      <Stack.Screen options={{ title: "Channel List Screen" }} />
+      <ChannelList
+        filters={memoizedFilters}
+        options={options}
+        onSelect={(channel) => {
+          setChannel(channel);
+          router.push(`/channel/${channel.cid}` as any);
+        }}
+      />
     </View>
   );
 }
@@ -16,16 +37,5 @@ export default function TabOneScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
   },
 });
