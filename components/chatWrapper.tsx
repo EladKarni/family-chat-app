@@ -1,13 +1,9 @@
 import React, { ReactElement } from "react";
 import { Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Chat, OverlayProvider, useCreateChatClient } from "stream-chat-expo";
-import {
-  chatApiKey,
-  chatUserId,
-  chatUserName,
-  chatUserToken,
-} from "../chatConfig";
+import { StreamChat } from "stream-chat";
+import { Chat, OverlayProvider } from "stream-chat-expo";
+import { chatApiKey, chatUserId, chatUserName } from "../chatConfig";
 
 const user = {
   id: chatUserId,
@@ -15,16 +11,12 @@ const user = {
 };
 
 export const ChatWrapper = ({ children }: { children: ReactElement }) => {
-  const chatClient = useCreateChatClient({
-    apiKey: chatApiKey,
-    userData: user,
-    tokenOrProvider: chatUserToken,
-  });
-
+  const chatClient = StreamChat.getInstance(chatApiKey);
+  chatClient.connectUser(user, chatClient.devToken(chatUserId));
   if (!chatClient) {
     return (
       <SafeAreaView>
-        <Text>Loading chat ...</Text>
+        <Text>Loading chat .......</Text>
       </SafeAreaView>
     );
   }
